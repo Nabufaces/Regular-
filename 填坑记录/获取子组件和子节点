@@ -1,0 +1,19 @@
+###1. 获取子组件:
+    经常我们需要获取子组件的某些特定属性或值,这时候我们就可以如下实现:
+        <tab title="总数({this.$refs.tableList.data.total})"></tab>
+        <list ref=tableList></list>	    //子组件
+    用ref标记子组件,使用this.$refs来获取标记的节点或组件
+    注意:ref引用是动态的
+
+###2. 获取子节点
+    通过Regular.dom.element(component, needAll) 可获取组件内部的节点:
+        （if needAll === true  返回子节点数组）
+        var dom = Regular.dom;
+        var component = new Regular({
+          template: '<div id='first'></div>
+                     <p id='last'></p>'
+          init: function(){
+            console.log(dom.element(this))  // => div#first
+            console.log(dom.element(this, true))    // => [div#first, p#last]
+          }
+        })

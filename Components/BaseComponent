@@ -1,0 +1,26 @@
+#Regular.js的项目提供了三个基本的组件:
+###1. BaseComponent:
+    ajax请求:
+        var url = '',
+            opts = {
+                method:"get",
+                data: { },    //参数
+                onload: function(json) { }	//返回结果
+            };
+        this.$request(url, opts);
+
+###2. ListComponent:
+    1）list更新:
+        请求参数:
+            condition:{}    //请求参数封装在condition中
+        更新:
+            this.$emit('updatelist');
+            
+    2）分页:
+        paging:{
+            current     //当前页
+            pageSize    //页长
+            sumTotal    //总条数
+        }
+       
+###3. ModalComponent:
