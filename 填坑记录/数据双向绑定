@@ -1,0 +1,20 @@
+###1. 实例:
+    <input  r-model='input' />
+    input的value值和this.data.input双向绑定
+
+###2. 实现一个表单双向绑定的实例
+    Regular.directive("ng-model", function(elem, exression){
+        this.$watch( expression, function( nval ){
+            elem.value = nval;
+        }) 
+    
+        elem.addEventListener("input", function(){
+            self.$update(expression, this.value); // enter digest
+        })
+    })
+    //directive用于新增指令
+    //component.$watch(expression,function(newVal, oldVal))
+    //注册一个监听回调，一旦绑定的表达式的值发生改变，它将会被调用
+    
+###3. 双向绑定--脏检查
+    

@@ -1,0 +1,36 @@
+##文件位置
+pro/widget/util/lazyimg
+
+###功能特性
+    图片异步加载
+    可自定义图片类以限定处理范围
+    可分别自定义加载中、完成后、错误时的css类
+    可选择是否启用渐入效果
+    可定义图片资源所属父容器，限定异步加载图片处理范围
+    可设定图片是否显示在页面viewport 的检查容差
+    自动根据网络情况判断下方图片预加载距离（wifi下3屏，移动网络下默认1屏，4G下2屏），也可以指定固定加载距离，不判断网络。
+    自动检测当前环境是否支持webp，如果支持则自动启用webp，减少网络流量，加快图片加载。
+    使用方式
+
+###用法
+    html 中img元素设定 data-src 属性：
+    <img data-src="http://haitao.nos.netease.com/xxxxxxxxx.jpg" >
+    ==============================================================================
+    JS：
+    define(
+        ['pro/widget/util/lazyimg'], function(_lz){
+            _lz._$$LazyImg._$allocate({
+                lazyClass：'', //img 元素上的类名，可选，可以用于缩小图片范围
+                loadingClass: '', //可选，默认为空，如果有值则会在图片加载中应用于图片元素
+                loaddedClass: '', //可选，默认为空，如果有值则会应图片加载后用于图片元素
+                loadErrorClass: '', //可选，默认为空，如果有值则会在图片加载失败后应用与图片元素
+                attr:'src', //img元素上使用 data-src 记录图片源地址
+                tolerance: 5,  //加载容差5， 默认10
+                preloadDist:'auto',  //预加载距离，auto为自动， 如果为数字N，则为viewport高度*N
+                fadeIn: true, //启用渐入效果
+                container: document.querySelector('#app')  //指定父容器，缩小查找范围
+            });
+    });
+
+###使用到的页面
+    h5 图文详情页

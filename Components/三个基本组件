@@ -6,6 +6,7 @@
                 method:"get",
                 data: { },    //参数
                 onload: function(json) { }	//返回结果
+                onerror: function(json){ }  //错误处理
             };
         this.$request(url, opts);
 
