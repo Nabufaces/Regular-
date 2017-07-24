@@ -1,0 +1,53 @@
+###1. component.$watch
+注册一个监听回调，一旦绑定的表达式的值发生改变，它将会被调用
+
+* Usage
+
+    component.$watch(expression, callback [, options])
+
+* Example
+```javascript
+    component.$watch("name", function(newValue, oldValue){
+      alert("name changed from " + oldValue + " to " + new Value) ; 
+    });
+```
+
+
+###2. component.$on
+注册一个事件处理程序
+
+* Usage
+    
+    component.$on(event, fn])
+    
+* Arguments
+    
+    * Param	        Type	            Detail
+    * eventName 	Object|String	    事件名
+    * fn	        Function	        监听器回调如果你传入一个Object, 会成为一个多重事件绑定
+
+
+###3. component.$emit
+触发指定事件
+
+* Usage
+
+    component.$emit(eventName [, args...])
+    
+* Arguments
+ 
+    * Param	        Type	            Detail
+    * eventName	    Object|String	    事件名
+    * args	        Function	        剩余的参数都会作为参数传入到监听器
+    
+* Example
+```javascript
+    var component = new Regular();
+    var clickHandler = function(arg) {
+        console.log('clickHandler:'+arg);
+    };
+    component.$on('hello', clickHandler); 
+    component.$emit('hello', 1); 
+    // clickHandler trigge
+    //console: clickHandler:1
+```   
