@@ -1,0 +1,138 @@
+###1. _$fixed(arg0, arg1){Number}
+浮点数值保留指定位数小数点
+```javascript
+    NEJ.define([
+        'base/util'
+    ],function(_u){
+        // 保留2位小数，返回3.14
+        var value = _u._$fixed(3.14159,2);
+    });
+```
+* Name	    Type	    Description
+* arg0	    Float	    浮点数
+* arg1	    Number	    小数位
+
+
+###2. _$forEach(arg0, arg1, arg2){Void}
+正序遍历列表，不支持中断
+
+回调函数输入输出说明
+* 类型	        说明
+* 输入	        Variable	值
+                Number	下标
+                Array	列表对象
+* 输出	        Boolean	是否匹配
+
+```javascript
+    NEJ.define([
+        'base/util'
+    ],function(_u){
+        var list = [1,2,3];
+        _u._$forEach(list,function(_item,_index,_list){
+            // TODO somthing
+        });
+    });
+```
+
+* Name	    Type	        Description
+* arg0	    Array	        列表
+* arg1	    function	    回调，如果返回true，则中断遍历
+* arg2	    Object	        回调函数调用时this对象
+
+
+###3. _$format(arg0, arg1){String}
+格式化时间，yyyy|yy|MM|cM|eM|M|dd|d|HH|H|mm|ms|ss|m|s|w
+
+各标识说明：
+* 标识	        说明
+* yyyy	        四位年份，如2001
+* yy	        两位年费，如01
+* MM	        两位月份，如08
+* M	            一位月份，如8
+* dd	        两位日期，如09
+* d	            一位日期，如9
+* HH	        两位小时，如07
+* H	            一位小时，如7
+* mm	        两位分钟，如03
+* m	            一位分钟，如3
+* ss	        两位秒数，如09
+* s	            一位秒数，如9
+* ms	        毫秒数，如234
+* w	            中文星期几，如一
+* ct	        12小时制中文后缀，上午/下午
+* et	        12小时制英文后缀，A.M./P.M.
+* cM	        中文月份，如三
+* eM	        英文月份，如Mar
+
+```javascript
+    NEJ.define([
+        'base/util'
+    ],function(_u){
+        // 根据格式输出时间，比如:2012-01-11,连接符可自定义
+        var str = _u._$format(new Date(),'yyyy-MM-dd');
+    });
+```
+Name	    Type	                    Description
+arg0	    Number | String | Date	    时间
+arg1	    String	                    格式
+
+###4. _$number2string(arg0, arg1){String}
+格式化数字为指定位数，不足位数前面用0补足
+
+```javascript
+NEJ.define([
+    'base/util'
+],function(_u){
+    // 2    -> 002
+    // 22   -> 022
+    // 222  -> 222
+    // 2222 -> 2222
+    var str = _u._$number2string(2,3);
+});
+```
+
+Name	    Type	    Description
+arg0	    Number	    数值
+arg1	    Number	    位数，至少1位
+
+
+###5. _$object2string(arg0, arg1, arg2){String}
+key-value对象转成key=value对后用分隔符join
+
+对象中不同类型的取值规则如下：
+* 类型	        取值规则
+* Function	    过滤掉，不输出
+* Date	        转成时间戳，getTime取值
+* Array	        值用逗号分隔，如[1,2,3] -> 1,2,3
+* Object	    使用JSON转成字符串
+
+```javascript
+    NEJ.define([
+        'base/util'
+    ],function(_u){
+        // 返回字符串 abc=abc,123=123
+        var obj1 = {
+            abc:"abc",
+            123:"123"
+        };
+        var str1 = _u._$object2string(obj1);
+    
+        // 返回字符串
+        // a=1871406603152186&b=1,2,3&d={"a":"a","b":"b"}&e=e&f=1&g=true
+        var obj2 = {
+            a:new Date,
+            b:[1,2,3],
+            c:function(){},
+            d:{a:'a',b:'b'},
+            e:'e',
+            f:1,
+            g:true
+        };
+        var str2 = _u._$object2string(obj2,'&');
+    });
+```
+
+Name	    Type	    Description
+arg0	    Object	    对象
+arg1	    String	    分隔符，默认为逗号
+arg2	    Boolean	    是否编码
