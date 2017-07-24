@@ -1,0 +1,51 @@
+###1. _$addClassName(arg0, arg1){Void}
+新增样式类，多个样式用空格分开
+
+结构举例
+```html
+  <div id="app">123</div>
+```
+
+脚本举例
+```javascript
+      NEJ.define([
+          'base/element'
+      ],function(_e){
+          // 添加样式 fc01 fc03
+          _e._$addClassName('app','fc01 fc03');
+      });
+```
+输出结果
+```html
+  <div id="abc" class="fc01 fc03">123</div>
+```
+* Name	    Type	            Description
+* arg0	    String | Node	    要操作的节点标识或者节点对象
+* arg1	    String	            要新增的样式类名称
+
+
+###2. _$remove(arg0, arg1){Void}
+删除节点
+
+结构举例
+```html
+  <div id="abc">123</div>
+```
+
+脚本举例
+```javascript
+      NEJ.define([
+          'base/element'
+      ],function(_e){
+          // 移除节点前先清理节点上的事件
+          _e._$remove('abc',false);
+          // 移除节点前不清理节点上的事件
+          _e._$remove('abc',true);
+      });
+```
+
+* Name	    Type	            Description
+* arg0	    String | Node	    节点标识或者对象
+* arg1	    Boolean	            是否禁止事件清理
+* 绑定的事件函数其实是一个闭包，闭包的存在使得该DOM在内存中始终占用着内存，如果不解除绑定的话，
+  删除的只是DOM结构，内存中依旧保存着数据。所以要手动将DOM占用的内存清空。

@@ -1,15 +1,17 @@
 #Regular.js的项目提供了三个基本的组件:
 ###1. BaseComponent:
-    ajax请求:
-        var url = '',
-            opts = {
-                method:"get",
-                data: { },    //参数
-                onload: function(json) { }	//返回结果
-                onerror: function(json){ }  //错误处理
-            };
-        this.$request(url, opts);
-
+ajax请求:
+```javascript
+    var url = '',
+        opts = {
+            method:"get",
+            data: { },    //参数
+            onload: function(json) { },	 //返回结果
+            onerror: function(json){ }      //错误处理
+        };
+    this.$request(url, opts);
+```
+    
 ###2. ListComponent:
     1）list更新:
         请求参数:
@@ -25,3 +27,25 @@
         }
        
 ###3. ModalComponent:
+```javascript
+    define(
+            [
+                'pro/components/modal/modal'
+            ],
+            function(ruleModal, _p, _pro) {
+                _p._$$ReportModule = _k._$klass();
+                _pro = _p._$$ReportModule._$extend(Module);
+        
+                _pro.__init = function(_options) {
+                    this.__supInit(_options);
+                    new ruleModal({
+                            data: {
+                                //传入modal中的参数
+                            }
+                        }).$inject(document.body);
+                    
+                };
+                _p._$$ReportModule._$allocate();
+            }
+        );
+```

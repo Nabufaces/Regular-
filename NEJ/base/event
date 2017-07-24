@@ -1,0 +1,34 @@
+###1. _$addEvent(arg0, arg1, arg2, arg3){Void}
+节点添加事件， 支持添加自定义事件， 对于自定义事件的实现逻辑由其他模块负责实现
+
+结构举例
+```javascript
+    NEJ.define([
+          'base/event'
+      ],function(_v){
+          // 添加系统预定义事件
+          _v._$addEvent(
+              'abc',
+              'mouseover',
+              function(_event){
+                  // TODO something
+              },
+              false
+          );
+    
+          // 添加多个事件，用空格分隔
+          _v._$addEvent(
+              'abc',
+              'mouseover click mousedown',
+              function(_event){
+                  // TODO something
+              },
+              false
+          );
+      });
+```
+* Name	    Type	                    Description
+* arg0	    String | Node | Object	    节点或者类构造或者对象
+* arg1	    String	                    事件类型，不带on前缀，不区分大小写，多个事件用空格分隔
+* arg2	    function	                事件处理函数
+* arg3	    Boolean	                    是否捕获阶段事件，IE低版本浏览器忽略此参数
