@@ -1,0 +1,88 @@
+###示例
+```scss
+    .m-home{
+        display: block;
+        div, ul{
+            + div{
+                margin-top: 20px;
+            }
+            border: 2px solid #ccc;
+            > a{
+                color: #fff;
+                &:hover{
+                   text-decoration: none; 
+                }
+                ~ span{
+                    display: block;
+                }
+            }
+        }
+    }
+```
+输出
+```css
+    .m-home{
+      display:block;
+    }
+    .m-home div,.m-home ul{
+      border:2px solid #cccccc;
+    }
+    .m-home div + div,.m-home ul + div{
+      margin-top:20px;
+    }
+    .m-home div >a,.m-home ul >a{
+      color:#ffffff;
+    }
+    .m-home div >a:hover,.m-home ul >a:hover{
+      text-decoration:none;
+    }
+    .m-home div >a ~ span,.m-home ul >a ~ span{
+      display:block;
+    }
+```    
+
+### %预置符
+* % 代表除最外层选择器之外的选择器序列，如：
+```scss
+    .ms-form{
+        select{
+          display: inline-block;
+          .ms-form-stack %{
+            display: block;
+          }
+        }
+    }
+```
+输出
+```css
+    .ms-form select{
+      display:inline-block;
+    }
+    .ms-form-stack,.ms-form-stack  select{
+      display:block;
+    }
+```
+
+###赋值操作
+* mcss中的variable与以$开头(与SCSS一致如$length), 这也是mcss引入的唯一一个非css规范的词法类型, 目的是防止潜在冲突和视觉上更易识别,mcss支持三种赋值^=,=与?=, 其中?=只在变量未赋值或null时生效, 所有的值类型都可以被赋值,包括函数,^=表示将赋值操作提升到全局作用域,
+```scss
+    // $variable has scope
+        $a = 10px;
+        $a ?= 20px;
+        
+        body{
+            left: $a; // exports left: 10px;
+        }
+        
+        // override before
+        $a = 30px;
+        
+        body{
+            left: $a; // exports left: 30px;
+        }
+        
+        // function is also a value can be assigned
+        $fn ?= ($name) {
+            left: $name;
+        }
+```

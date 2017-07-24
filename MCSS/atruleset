@@ -1,0 +1,413 @@
+###@extend
+继承由输入的complexselector指定的base ruleset， 表现为在在另一个base ruleset中组合进的selector.
+@extend是css preprocessor中另一个较重要的特性,可以帮助我们缓解在html写入过多类名的泥潭
+mcss中的@extend 有以下特性:
+1. 需完整描述complex selector，这样做首先是为了避免歧义, 如:
+
+```scss
+        .class-1 span{
+            name: class-1;
+        }
+        .body-1{
+            // need specify the full complex selector
+            // if only `span` will not work( but work in scss)
+            @extend .class-1 span;
+        }
+        // 输出:
+        .class-1 span,.body-1{
+          name:class-1;
+        }
+```
+
+2. 有作用域
+* 与参数一样, 会优先获取内层作用域的的base ruleset, 并且只能使用定义过的base ruleset(也就是说无法后向引用), 这个是为了规避循环@extend;
+
+```scss
+    class-1{
+        name: class-1 in global;
+    }
+    
+    div.body-4, .other-body{
+        class-1{
+            name: class-1 in body-4;
+        }
+        // base class has scope
+        @extend class-1;
+    }
+    输出 : @TODO
+    
+    class-1{
+      name:class-1 in global;
+    }
+    div.body-4 class-1,.other-body class-1,div.body-4,.other-body{
+      name:class-1 in body-4;
+    }
+```
+    
+3. 支持多重extend
+* 多个complex以 , 分割(selectorlist),视为多重@extend;
+
+```scss
+    .class-1{
+        name: class-1 in global;
+    }
+    .class-2{
+        name: class-2 in global;
+    }
+    body{
+      .class-3{
+        name: class-3 in local;
+      }
+      @extend .class-1, .class-2, .class-3;
+    }
+    
+    //输出:
+    .class-1,body{
+      name:class-1 in global;
+    }
+    .class-2,body{
+      name:class-2 in global;
+    }
+    body .class-3,body{
+      name:class-3 in local;
+    }
+```
+
+4. 支持nested extend
+* mcss的extend支持层级继承， 输出符合预期的结构
+
+```scss
+    // nested @extend
+    .class-3{
+      name: class-3 in global;
+    }
+    
+    .class-2{
+      name: class-2 in global;
+      @extend .class-3;
+    }
+    .class-1{
+      name: class-1 in global;
+      @extend .class-2;
+    }
+    body{
+      @extend .class-1;
+    }
+    //输出:
+    
+    .class-3,.class-2,.class-1,body{
+      name:class-3 in global;
+    }
+    .class-2,.class-1,body{
+      name:class-2 in global;
+    }
+    .class-1,body{
+      name:class-1 in global;
+    }
+    //总体来讲mcss将scss中的@extend概念简化了，而功能上各有偏重
+```
+
+###@import
+* mcss中的import很灵活，可以在各个block中引入. 如果引入文件为.css后缀 则不做修改，原样输出.
+
+考虑有如下文件 _markdown.mcss
+
+```scss
+    body {
+        font-family: "Avenir Next", Helvetica, Arial, sans-serif;
+        padding:1em;
+        background:#fefefe;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold;
+    }
+```
+以如下方式import后
+```scss
+    // import in global
+    @import './_markdown.mcss';
+    
+    .m-markdown {
+        // import in block
+        left: 20px;
+        @import './_markdown.mcss';
+    }
+    
+    // import as media type
+    @import './_markdown.mcss' screen and (max-width: 200px);
+    
+    // import raw css
+    @import './_raw.css';
+```
+输出
+```scss
+    body{
+      font-family:"Avenir Next",Helvetica,Arial,sans-serif;
+      padding:1em;
+      background:#fefefe;
+    }
+    h1,h2,h3,h4,h5,h6{
+      font-weight:bold;
+    }
+    .m-markdown{
+      left:20px;
+    }
+    .m-markdown body{
+      font-family:"Avenir Next",Helvetica,Arial,sans-serif;
+      padding:1em;
+      background:#fefefe;
+    }
+    .m-markdown h1,.m-markdown h2,.m-markdown h3,.m-markdown h4,.m-markdown h5,.m-markdown h6{
+      font-weight:bold;
+    }
+    @media screen and (max-width: 200px){
+      body{
+        font-family:"Avenir Next",Helvetica,Arial,sans-serif;
+        padding:1em;
+        background:#fefefe;
+      }
+      h1,h2,h3,h4,h5,h6{
+        font-weight:bold;
+      }
+    }
+    @import  url("./_raw.css");
+    
+    //这个特性，可以使得markdown.mcss可以抽离成一个模块
+    //此外, 如果产生循环引用，mcss会给出错误提示
+```
+
+
+###@abstract
+* 作用如其名, 被修饰的ruleset成为抽象ruleset, 不会输出, 但是仍然可以被@extend;
+
+如
+
+```scss
+    // simple @abstract ruleset
+    @abstract abs1{
+        name: abs1;
+    }
+    body{
+        // then abs1 exports
+        @extend abs1;
+        left: 10px;
+    }
+ ```
+ 
+输出
+```scss
+    body{
+      name:abs1;
+    }
+    body{
+      left:10px;
+    }
+```
+
+即原selector消失 只留@extend 它的selector
+这个scss也有对应的解决方案(引入%前缀)值得关注的是mcss中的@abstract可以接受一个block, 并且由于mcss中的@import的灵活性, 结合使用可以解决scss、scss等等预处理器无法有效控制输出css的缺陷
+
+```scss
+    @abstract {
+        // @abstract block 没有独立作用域, 注册在外围作用域
+        $left = 20px; 
+        .abs3{
+            name: abs3;        
+            left: $left;
+        }
+        .abs4{
+            name: abs4;
+            left: $left;
+        }
+    }
+    body{
+        // then .abs2 exports
+        @extend .abs3;
+        left: $left;
+    }
+```
+输出 :
+
+```scss
+    body{
+      name:abs3;
+      left:20px;
+    }
+    body{
+      left:20px;
+    }
+```
+即abstract block中只有被@extend 的class的内容被输出了
+
+@abstract block只影响内部的ruleset的输出 ,而不影响块内的其它部分 可以正常进行对block内的变量读取，函数调用, @extend等
+
+鉴于有抽象整个import 的 mcss file的需求, 也提供了一个简单写法, 抽象化引入的mcss file;
+```scss
+  @abstract 'path/to/xx.mcss';
+```
+正确控制@abstract, 可以避免不需要的样式输出 less等预处理器导致的输出样式过大的问题, 被引入的mcss文件如何表现完全取决于 @abstract、@import、@media等特性的结合使用
+
+###@media
+
+mcss中的@media 层级组合的特性(与ruleset的层级相互独立), 并且 media expression中的键值都接受mcss表达式(即可以是参数，也可以进行计算等)
+
+// 较复杂的ruleset media 相互嵌套
+```scss
+    body2{
+        left: 20px;
+        @media screen and (max-width: 10px), print{
+            left: 10px;
+            body{
+                right: 20px;
+                $minw = 100px;
+                $prop = min-width; 
+                // expression 的属性键与值 都可以是表达式
+                @media($prop: $minw + 100px){
+                    div{
+                        right: 20px;
+                    }
+                }
+            }
+        }
+    }
+```
+输出:
+```scss
+    body2{
+      left:20px;
+    }
+    @media screen and (max-width: 10px),print{
+      body2{
+        left:10px;
+      }
+      body2 body{
+        right:20px;
+      }
+    }
+    @media screen and (max-width: 10px) and (min-width: 200px),print and (min-width: 200px){
+      body2 body div{
+        right:20px;
+      }
+    }
+```
+
+mcss中expresion
+
+需要注意的是由于@media的语法要求 不能有两个mediaType在一个mediaquery中, 所以mcss会忽略不符合要求的层级嵌套, 如:
+
+```scss
+    @media screen{
+      @media print{ //这种情况无法组合,mcss会忽略组合仅将其推到外层嵌套
+      
+      }
+    }
+```
+
+#@if, @ifelse , @else, @for
+
+1. 条件语句@if, @ifelse , @else
+
+语法 
+```scss
+@if test block (@elseif test block)* (@else block)?
+```
+```scss
+    $name = 0px;
+    @if $name != 0px {
+        body{
+            name: if;
+        }
+    }@elseif !$name2 {
+        body{
+            name: elseif;
+        }
+    }@else{
+        body{
+            name: else;
+        }
+    }
+```
+输出:
+```scss
+    body{
+      name:elseif;
+    }
+```
+
+2. 循环语句 @for of , @for in
+
+mcss中只有一种Loop语句----@for语句，除了实现SCSS中的所有Loop语句的功能(@each @for @while)也可以组合出比SCSS更强大遍历语句
+
+语法
+ ```scss
+  @for item:VAR[, index:VAR]? ['by' step:expression]? [('of'|'in') valueslist] block
+ ```
+
+mcss支持两种Loop语句，分别是遍历列表，和hashmap(利用valuesList 模拟, mcss并不存在这种数据结构), 并且可以通过by关键字 控制步近
+
+1. @for of
+```scss
+    @for $item, $i of test, hello, hoho{
+        .name-#{$item}{
+            width: 10px * $i;
+        }
+    }
+```
+输出:
+```scss
+    .name-test{
+      width:0px;
+    }
+    .name-hello{
+      width:10px;
+    }
+    .name-hoho{
+      width:20px;
+    }
+```
+
+2. 利用'by'关键字控制step, step 可以是一个负值 实现后序遍历.
+```scss
+    @for $item, $indx by -1 of one, two, three{
+      .m-module-#{$item} {
+        left: $index * 30px + 20px;
+      }
+    }
+```
+输出:
+```scss
+    .m-module-three{
+      left:80px;
+    }
+    .m-module-two{
+      left:50px;
+    }
+    .m-module-one{
+      left:20px;
+    }
+```
+
+3. @for in
+mcss中可以利用一定格式的valueslist模拟hashmap(但仍然是valueslist，你仍然可以用for of来遍历它), 使得其可以用@for in 来遍历
+格式形如:
+```scss
+  $hashmap = key1 value1, key2 value2 ..., keyn value
+```
+为避免格式冲突，你可以使用()将list类型的值包裹起来
+Exmaple
+```scss
+    $fakehash = left 20px, top 30px, width 40px;
+    body{
+      @for $item, $prop in $fakehash {
+        #{$prop} : $item;
+      }
+    }
+```
+输出:
+```scss
+    body{
+      left:20px;
+      top:30px;
+      width:40px;
+    }
+```
